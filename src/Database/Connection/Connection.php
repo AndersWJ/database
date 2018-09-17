@@ -2,7 +2,9 @@
 
 namespace Awj\Database\Connection;
 
+use Awj\Database\Grammar\Grammar;
 use PDO;
+use Awj\Database\QueryBuilder;
 
 abstract class Connection
 {
@@ -41,7 +43,20 @@ abstract class Connection
     }
 
     /**
+     * @return QueryBuilder
+     */
+    public function newQuery()
+    {
+        return new QueryBuilder($this);
+    }
+
+    /**
      * Connects to the database
      */
     abstract public function connect();
+
+    /**
+     * @return Grammar
+     */
+    abstract public function getGrammar();
 }

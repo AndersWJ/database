@@ -2,19 +2,35 @@
 
 namespace Tests;
 
-use PDO;
 use PHPUnit\Framework\TestCase;
-use Awj\Database\Connection\Sqlite as SqliteConnection;
+use Awj\Database\DatabaseManager;
 
 class DatabaseTest extends TestCase
 {
-    /** @test */
+    /** @test
+     * @throws \Exception
+     */
     public function it_can_test()
     {
-        $connection = new SqliteConnection([
+        $config = [
+            'type'     => 'sqlite',
             'database' => ':memory:'
-        ]);
+        ];
 
-        $this->assertInstanceOf(PDO::class, $connection->getPDO());
+        $db = new DatabaseManager();
+        $db->addConnection($config);
+        $db->setAsGlobal();
+
+        $pdo = $db->getConnection()->getPDO()->prepare('create table user (username text)');
+        $pdo->execute();
+
+        $pdo = $db->getConnection()->getPDO()->prepare('insert into user select "benny"');
+        $pdo->execute();
+
+        $queryBuilder = DatabaseManager::newQuery();
+
+        $queryBuilder->table('user')->all();
+
+        $this->assertEquals(['user' => 'benny'], $queryBuilder);
     }
 }

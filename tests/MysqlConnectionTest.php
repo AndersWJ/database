@@ -2,17 +2,17 @@
 
 namespace Tests;
 
+use Awj\Database\Grammar;
 use PDOException;
 use PHPUnit\Framework\TestCase;
-use Awj\Database\Connection\Connection;
-use Awj\Database\Connection\Mysql as MysqlConnection;
+use Awj\Database\Connection;
 
 class MysqlConnectionTest extends TestCase
 {
     /** @test */
     public function it_can_be_newed_up()
     {
-        $connection = new MysqlConnection([
+        $connection = new Connection\Mysql([
             'host'     => '127.0.0.1',
             'port'     => '33066',
             'username' => 'admin',
@@ -20,8 +20,8 @@ class MysqlConnectionTest extends TestCase
             'database' => 'testdb',
         ]);
 
-        $this->assertInstanceOf(MysqlConnection::class, $connection);
-        $this->assertInstanceOf(Connection::class, $connection);
+        $this->assertInstanceOf(Connection\Connection::class, $connection);
+        $this->assertInstanceOf(Connection\Mysql::class, $connection);
     }
 
     /** @test */
@@ -29,7 +29,7 @@ class MysqlConnectionTest extends TestCase
     {
         $this->expectException(PDOException::class);
 
-        $connection = new MysqlConnection([
+        $connection = new Connection\Mysql([
             'host'     => 'your_momma',
             'port'     => 'invalid_as_hell',
             'username' => 'admin_is_not_home',
@@ -37,4 +37,20 @@ class MysqlConnectionTest extends TestCase
             'database' => 'no_db',
         ]);
     }
+
+    /** @test */
+    public function it_knows_which_grammar_to_use()
+    {
+        $connection = new Connection\Mysql([
+            'host'     => '127.0.0.1',
+            'port'     => '33066',
+            'username' => 'admin',
+            'password' => 'secret',
+            'database' => 'testdb',
+        ]);
+
+        $this->assertInstanceOf(Grammar\Grammar::class, $connection->getGrammar());
+        $this->assertInstanceOf(Grammar\Mysql::class, $connection->getGrammar());
+    }
+
 }
